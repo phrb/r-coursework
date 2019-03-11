@@ -1,7 +1,7 @@
 # -*- mode: org -*-
 # -*- coding: utf-8 -*-
 #+STARTUP: overview indent inlineimages logdrawer
-#+TITLE:  Coursework for /Advanced =R=/
+#+TITLE:  Coursework for /Advanced/ =R=
 #+AUTHOR:      Pedro H R Bruel
 #+LANGUAGE:    en
 #+TAGS: noexport(n) Stats(S)
@@ -20,3 +20,195 @@
 #+LATEX_HEADER: \input{latex/configuration.tex}
 
 * First Session
+** Introduction to =R=
+*** Evaluating Equality
+    #+begin_SRC R :results output :session *R*
+    (0.1 + 0.2) == 0.3
+    print(c(0.1, 0.2, 0.3), digits = 20)
+    all.equal(0.1 + 0.2, 0.3)
+    isTRUE(all.equal(0.1 + 0.2, 0.4))
+    #+end_SRC
+
+    #+RESULTS:
+    : [1] FALSE
+    :
+    : [1] 0.10000000000000000555 0.20000000000000001110 0.29999999999999998890
+    :
+    : [1] TRUE
+    :
+    : [1] FALSE
+*** Arguments
+    #+begin_SRC R :results output :session *R*
+    min(-1, 5, 118)
+    max(-1, 5, 118)
+    args(max)
+
+    mean(-1, 5, 118)
+    args(mean)
+
+    median(-1, 5, 118)
+    args(median)
+    #+end_SRC
+
+    #+RESULTS:
+    #+begin_example
+    [1] -1
+
+    [1] 118
+
+    function (..., na.rm = FALSE)
+    NULL
+
+    [1] -1
+
+    function (x, ...)
+    NULL
+
+    [1] -1
+
+    function (x, na.rm = FALSE, ...)
+    NULL
+    #+end_example
+*** Debugging
+    The =browser()= function stops execution and
+    allows step-by-step execution.
+
+    #+begin_SRC R :results output :session *R*
+    plus2 <- function(x) {
+      x + 2
+    }
+
+    test <- function(x) {
+      browser()
+      a <- 3
+      b <- plus2(x)
+      a / b
+    }
+
+    test(2)
+    #+end_SRC
+
+    #+RESULTS:
+    :
+    : Called from: test(2)
+    : debug at #3: a <- 3
+*** Exercises
+**** Exercise 0
+     #+begin_SRC R :results output :session *R*
+     mat <- matrix(0L + sample(c(TRUE, FALSE), 12, replace = TRUE), 3)
+     mat
+     str(mat)
+     typeof(mat)
+     #+end_SRC
+
+     #+RESULTS:
+     :
+     :      [,1] [,2] [,3] [,4]
+     : [1,]    1    1    1    0
+     : [2,]    1    0    0    0
+     : [3,]    0    1    0    0
+     :
+     :  int [1:3, 1:4] 1 1 0 1 0 1 1 0 0 0 ...
+     :
+     : [1] "integer"
+**** TODO Exercise 1
+     #+begin_SRC R :results output :session *R*
+     my_sum_every <- function(x, step) {
+       current_index <- 1
+       sums <- c()
+
+       while(current_index < length(x)) {
+         current_step <- 0
+         current_sum <- c()
+
+         while(current_step < step) {
+           current_sum <- c(current_sum, x[current_index + current_step])
+           current_step <- current_step + 1
+         }
+
+         current_index <- current_index + step
+         sums <- c(sums, sum(current_sum))
+       }
+
+       return(sums)
+     }
+
+     my_sum_every(1:11, 2)
+     #+end_SRC
+
+     #+RESULTS:
+     :
+     : [1]  3  7 11 15 19
+**** Exercise 2
+     #+begin_SRC R :results output :session *R*
+     str(iris)
+     sapply(iris, is.numeric)
+     str(iris[sapply(iris, is.numeric)])
+     sapply(iris[sapply(iris, is.numeric)], mean)
+     #+end_SRC
+
+     #+RESULTS:
+     #+begin_example
+     'data.frame':	150 obs. of  5 variables:
+      $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+      $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+      $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+      $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+      $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+
+     Sepal.Length  Sepal.Width Petal.Length  Petal.Width      Species
+             TRUE         TRUE         TRUE         TRUE        FALSE
+
+     'data.frame':	150 obs. of  4 variables:
+      $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+      $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+      $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+      $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+
+     Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+         5.843333     3.057333     3.758000     1.199333
+     #+end_example
+**** Exercise 3
+     #+begin_SRC R :results output :session *R*
+     mat <- matrix(0, 10, 3)
+     mat[c(1, 5, 8, 12, 16, 17, 19, 23, 24, 29)] <- 1
+     mat
+
+     myarray <- array(dim = c(2, 2, 2))
+     myarray[2, 1, 1] <- 0
+     myarray[1, 2, 1] <- 1
+     myarray[1, 1, 2] <- 2
+     myarray
+
+     apply(mat, 1, function(x) myarray[x[1] + 1, x[2] + 1, x[3] + 1])
+     #+end_SRC
+
+     #+RESULTS:
+     #+begin_example
+
+           [,1] [,2] [,3]
+      [1,]    1    0    0
+      [2,]    0    1    0
+      [3,]    0    0    1
+      [4,]    0    0    1
+      [5,]    1    0    0
+      [6,]    0    1    0
+      [7,]    0    1    0
+      [8,]    1    0    0
+      [9,]    0    1    1
+     [10,]    0    0    0
+
+     , , 1
+
+          [,1] [,2]
+     [1,]   NA    1
+     [2,]    0   NA
+
+     , , 2
+
+          [,1] [,2]
+     [1,]    2   NA
+     [2,]   NA   NA
+
+      [1]  0  1  2  2  0  1  1  0 NA NA
+     #+end_example
